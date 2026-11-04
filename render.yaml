@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: omnideck-arena
+    runtime: node
+    branch: main
+    plan: free
+    # --include=dev là BẮT BUỘC: Render đặt NODE_ENV=production cho bước build,
+    # nếu thiếu cờ này npm sẽ bỏ qua devDependencies (typescript, vite) và
+    # `npm run build` sẽ thất bại với exit code 1.
+    buildCommand: npm ci --include=dev --no-audit --no-fund && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "20.19.0"
+      # Dữ liệu trên Render free là tạm thời (mất khi redeploy/restart).
+      # Thêm 2 biến dưới đây trong Dashboard > Environment để lưu vĩnh viễn bằng Upstash Redis:
+      # - key: UPSTASH_REDIS_REST_URL
+      #   sync: false
+      # - key: UPSTASH_REDIS_REST_TOKEN
+      #   sync: false
